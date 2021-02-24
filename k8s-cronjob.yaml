@@ -7,17 +7,21 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "true"
+            vault.hashicorp.com/agent-inject-secret-cloudflare-ddns: "secret/cloudflare-ddns"
+            vault.hashicorp.com/agent-inject-template-cloudflare-ddns: |
+              {{- with secret "secret/cloudflare-ddns" -}}
+              export AUTH_KEY={{ .Data.data.AUTH_KEY }}
+              export NAME={{ .Data.data.NAME }}
+              export RECORD_ID={{ .Data.data.RECORD_ID }}
+              export ZONE_ID={{ .Data.data.ZONE_ID }}
+              {{- end }}
+            vault.hashicorp.com/agent-pre-populate-only: "true"
+            vault.hashicorp.com/role: "cloudflare-ddns"
         spec:
           containers:
             - name: cloudflare-ddns
-              image: mirioeggmann/cloudflare-ddns:latest
-              env:
-              - name: ZONE_ID
-                value: ""
-              - name: RECORD_ID
-                value: ""
-              - name: AUTH_KEY
-                value: ""
-              - name: NAME
-                value: ""
+              image: mikesmitty/cloudflare-ddns:latest
           restartPolicy: OnFailure
