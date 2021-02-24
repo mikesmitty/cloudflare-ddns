@@ -1,15 +1,16 @@
 # Cloudflare DDNS
-A kubernetes cronjob that runs a docker-container every 5 minutes to check & update your external ip.
+A kubernetes cronjob that runs a docker-container every 5 minutes to check & update your external ip.  
+These steps assume you have hashicorp vault with sidecar injection enabled and running in your cluster.
 
 ## Execute kubernetes cronjob
 ```
 # 1. Clone the repo
-git clone https://github.com/mirioeggmann/cloudflare-ddns.git
+git clone https://github.com/mikesmitty/cloudflare-ddns.git
 
 # 2. Navigate into it
 cd cloudflare-ddns
 
-# 3. Edit the k8s-cronjob.yaml according to "Values for k8s-cronjob.yaml"
+# 3. Add the required secrets and access policies to your vault cluster
 
 # 4. Execute the cronjob
 kubectl apply -f k8s-cronjob.yaml
@@ -29,9 +30,9 @@ vault kv put secret/cloudflare-ddns \
     ZONE_ID=023e105f4ecef8ad9ca31a8372d0c353 \
     RECORD_ID=372e67954025e0ba6aaa6d586b9e0b59 \
     AUTH_KEY=c2547eb745049flc9320b638f5e225cf483cc5cfdda41 \
-    NAME=example.com
+    NAME=ddns.example.com
 ```
-## Create and apply an app access policy for the cronjob to read the secret
+## Create and apply an access policy for the cronjob to read the secret
 ```
 cat <<EOF > app-policy.hcl
 path "secret*" {
